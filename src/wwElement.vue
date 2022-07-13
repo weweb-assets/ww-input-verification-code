@@ -5,6 +5,7 @@
         :key="index"
         :ref="`ww-input-verification-code-${index}`"
         v-bind="content.input"
+        @keydown.backspace="backspace(index)"
         :ww-props="{ value: localValue[index] }"
         @element-event="onChange(index, $event)"
     />
@@ -24,9 +25,9 @@ export default {
         const { value, setValue } = wwLib.wwVariable.useComponentVariable({
             uid: props.uid,
             name: 'value',
-            defaultValue: null,
+            defaultValue: '',
             componentType: 'element',
-            type: 'number',
+            type: 'string',
             readonly: true,
             resettable: true,
         });
@@ -50,16 +51,21 @@ export default {
         },
     },
     watch: {
-        value(value) {
-            this.localValue = `${value}`;
-        },
         isComplete(value) {
             if (!value) return;
-            this.$emit('trigger-event', { name: 'complete', event: { value: parseInt(this.localValue) } });
+            this.$emit('trigger-event', { name: 'complete', event: { value: this.localValue.trim() } });
         },
     },
     methods: {
         replaceAt(str, index, replacement) {
+            if (!replacement.length) replacement = ' ';
+            for (const i in Array(index).fill(0)) {
+                if (str[i] === undefined && index !== i) {
+                    console.log(i);
+                    str = str.substring(0, i) + ' ' + str.substring(i + 1);
+                    console.log(str);
+                }
+            }
             return str.substring(0, index) + replacement + str.substring(index + replacement.length);
         },
         onChange(index, { value, type }) {
@@ -68,31 +74,35 @@ export default {
                 if (index < this.content.nbrOfCode - 1)
                     this.$refs[`ww-input-verification-code-${index + 1}`].$el.nextElementSibling.children[0].focus();
                 else this.$refs[`ww-input-verification-code-${index}`].$el.nextElementSibling.children[0].blur();
-            } else {
-                if (index)
-                    this.$refs[`ww-input-verification-code-${index - 1}`].$el.nextElementSibling.children[0].focus();
             }
-            this.localValue = this.replaceAt(`${this.localValue}`, index, `${value} `);
-            this.setValue(parseInt(this.localValue));
-            this.$emit('trigger-event', { name: 'change', event: { value: parseInt(this.localValue) } });
+            this.localValue = this.replaceAt(`${this.localValue}`, index, `${value}`).substring(
+                0,
+                this.content.nbrOfCode
+            );
+            this.setValue(this.localValue.trim());
+            this.$emit('trigger-event', { name: 'change', event: { value: this.localValue.trim() } });
+        },
+        backspace(index) {
+            if (index && (this.localValue[index] === ' ' || this.localValue[index] === undefined))
+                this.$nextTick(() =>
+                    this.$refs[`ww-input-verification-code-${index - 1}`].$el.nextElementSibling.children[0].focus()
+                );
         },
     },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .ww-input-verification-code {
-    /deep/ * {
-        /* Chrome, Safari, Edge, Opera */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        /* Firefox */
-        input[type='number'] {
-            -moz-appearance: textfield;
-        }
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    /* Firefox */
+    input[type='number'] {
+        -moz-appearance: textfield;
     }
 }
 </style>
