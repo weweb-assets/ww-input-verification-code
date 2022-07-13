@@ -21,12 +21,5 @@ export default {
             defaultValue: 6,
             bindable: true,
         },
-        required: {
-            label: 'Required',
-            type: 'OnOff',
-            section: 'settings',
-            defaultValue: true,
-            bindable: true,
-        },
     },
 };
