@@ -7,7 +7,7 @@ export default {
     triggerEvents: [
         { name: 'change', label: { en: 'On change' }, event: { value: '' } },
         { name: 'initValueChange', label: { en: 'On init value change' }, event: { value: '' } },
-        { name: 'complete', label: { en: 'On complete' }, event: { value: 0 } },
+        { name: 'complete', label: { en: 'On complete' }, event: { value: '' } },
     ],
     properties: {
         input: {
@@ -19,13 +19,6 @@ export default {
             type: 'Number',
             section: 'settings',
             defaultValue: 6,
-            bindable: true,
-        },
-        required: {
-            label: 'Required',
-            type: 'OnOff',
-            section: 'settings',
-            defaultValue: true,
             bindable: true,
         },
     },
