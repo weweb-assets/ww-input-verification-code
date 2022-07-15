@@ -61,9 +61,7 @@ export default {
             if (!replacement.length) replacement = ' ';
             for (const i in Array(index).fill(0)) {
                 if (str[i] === undefined && index !== i) {
-                    console.log(i);
                     str = str.substring(0, i) + ' ' + str.substring(i + 1);
-                    console.log(str);
                 }
             }
             return str.substring(0, index) + replacement + str.substring(index + replacement.length);
