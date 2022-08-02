@@ -62,8 +62,9 @@ export default {
         },
         onChange(index, { value, type }) {
             if (type !== 'update:value') return;
+            value = value === null || value === undefined ? '' : `${value}`;
             value = value.trim();
-            if (!value) {
+            if (!value.length) {
                 value = ' ';
             } else {
                 const newFocusIndex = Math.min(this.content.nbrOfCode - 1, index + value.length);
@@ -73,10 +74,7 @@ export default {
                     ].$el.nextElementSibling.children[0].focus();
                 }
             }
-            this.localValue = this.replaceAt(`${this.localValue}`, index, `${value}`).substring(
-                0,
-                this.content.nbrOfCode
-            );
+            this.localValue = this.replaceAt(`${this.localValue}`, index, value).substring(0, this.content.nbrOfCode);
             this.localValue = this.localValue.trim();
             this.setValue(this.localValue);
             this.$emit('trigger-event', { name: 'change', event: { value: this.localValue } });
