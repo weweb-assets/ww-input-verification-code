@@ -58,27 +58,26 @@ export default {
     },
     methods: {
         replaceAt(str, index, replacement) {
-            if (!replacement.length) replacement = ' ';
-            for (const i in Array(index).fill(0)) {
-                if (str[i] === undefined && index !== i) {
-                    str = str.substring(0, i) + ' ' + str.substring(i + 1);
-                }
-            }
             return str.substring(0, index) + replacement + str.substring(index + replacement.length);
         },
         onChange(index, { value, type }) {
             if (type !== 'update:value') return;
-            if (value !== '') {
-                if (index < this.content.nbrOfCode - 1)
-                    this.$refs[`ww-input-verification-code-${index + 1}`].$el.nextElementSibling.children[0].focus();
-                else this.$refs[`ww-input-verification-code-${index}`].$el.nextElementSibling.children[0].blur();
+            value = value === null || value === undefined ? '' : `${value}`;
+            value = value.trim();
+            if (!value.length) {
+                value = ' ';
+            } else {
+                const newFocusIndex = Math.min(this.content.nbrOfCode - 1, index + value.length);
+                if (index !== newFocusIndex) {
+                    this.$refs[
+                        `ww-input-verification-code-${newFocusIndex}`
+                    ].$el.nextElementSibling.children[0].focus();
+                }
             }
-            this.localValue = this.replaceAt(`${this.localValue}`, index, `${value}`).substring(
-                0,
-                this.content.nbrOfCode
-            );
-            this.setValue(this.localValue.trim());
-            this.$emit('trigger-event', { name: 'change', event: { value: this.localValue.trim() } });
+            this.localValue = this.replaceAt(`${this.localValue}`, index, value).substring(0, this.content.nbrOfCode);
+            this.localValue = this.localValue.trim();
+            this.setValue(this.localValue);
+            this.$emit('trigger-event', { name: 'change', event: { value: this.localValue } });
         },
         backspace(index) {
             if (index && (this.localValue[index] === ' ' || this.localValue[index] === undefined))
