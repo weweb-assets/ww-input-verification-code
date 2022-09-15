@@ -1,14 +1,16 @@
 <template>
-    <wwElement
-        class="ww-input-verification-code"
-        v-for="(_, index) of Array(content.nbrOfCode)"
-        :key="index"
-        :ref="`ww-input-verification-code-${index}`"
-        v-bind="content.input"
-        @keydown.backspace="backspace(index)"
-        :ww-props="{ value: localValue[index] }"
-        @element-event="onChange(index, $event)"
-    />
+    <div class="ww-input-verification-code-container">
+        <wwElement
+            class="ww-input-verification-code"
+            v-for="(_, index) of Array(content.nbrOfCode)"
+            :key="index"
+            :ref="`ww-input-verification-code-${index}`"
+            v-bind="content.input"
+            @keydown.backspace="backspace(index)"
+            :ww-props="{ value: localValue[index] }"
+            @element-event="onChange(index, $event)"
+        />
+    </div>
 </template>
 
 <script>
@@ -60,6 +62,17 @@ export default {
         replaceAt(str, index, replacement) {
             return str.substring(0, index) + replacement + str.substring(index + replacement.length);
         },
+        focusInput(index) {
+            const input =
+                this.$refs[
+                    `ww-input-verification-code-${index}`
+                ].$el.nextElementSibling.children[0].getElementsByTagName('INPUT')[0];
+            if (input) {
+                input.focus();
+            } else {
+                wwLib.wwLog.warn('WARNING [INPUT-CODE], failed to focus input');
+            }
+        },
         onChange(index, { value, type }) {
             if (type !== 'update:value') return;
             value = value === null || value === undefined ? '' : `${value}`;
@@ -69,21 +82,17 @@ export default {
             } else {
                 const newFocusIndex = Math.min(this.content.nbrOfCode - 1, index + value.length);
                 if (index !== newFocusIndex) {
-                    this.$refs[
-                        `ww-input-verification-code-${newFocusIndex}`
-                    ].$el.nextElementSibling.children[0].focus();
+                    this.focusInput(newFocusIndex);
                 }
             }
             this.localValue = this.replaceAt(`${this.localValue}`, index, value).substring(0, this.content.nbrOfCode);
             this.localValue = this.localValue.trim();
-            this.setValue(this.localValue);
-            this.$emit('trigger-event', { name: 'change', event: { value: this.localValue } });
+            this.setValue(`${this.localValue}`);
+            this.$emit('trigger-event', { name: 'change', event: { value: `${this.localValue}` } });
         },
         backspace(index) {
             if (index && (this.localValue[index] === ' ' || this.localValue[index] === undefined))
-                this.$nextTick(() =>
-                    this.$refs[`ww-input-verification-code-${index - 1}`].$el.nextElementSibling.children[0].focus()
-                );
+                this.$nextTick(() => this.focusInput(index - 1));
         },
     },
 };
@@ -100,6 +109,9 @@ export default {
     /* Firefox */
     input[type='number'] {
         -moz-appearance: textfield;
+    }
+    &-container {
+        display: flex;
     }
 }
 </style>
