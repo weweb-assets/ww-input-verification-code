@@ -63,20 +63,10 @@ export default {
             return str.substring(0, index) + replacement + str.substring(index + replacement.length);
         },
         focusInput(index) {
-            // Difference between editor and front is due to how component are loaded.
-            // Please fix this by using a different method when available on the editor
-            /* wwEditor:start */
-            const input =
-                this.$refs[`ww-input-verification-code-${index}`].$el.nextElementSibling.getElementsByTagName(
-                    'INPUT'
-                )[0];
-            /* wwEditor:end */
-            /* wwFront:start */
-            const input = this.$refs[`ww-input-verification-code-${index}`].$el.getElementsByTagName('INPUT')[0];
-            /* wwFront:end */
-            if (input) {
-                input.focus();
-            } else {
+            const input = this.$refs[`ww-input-verification-code-${index}`].componentRef;
+            try {
+                input.focusInput();
+            } catch {
                 wwLib.wwLog.warn('WARNING [INPUT-CODE], failed to focus input');
             }
         },
