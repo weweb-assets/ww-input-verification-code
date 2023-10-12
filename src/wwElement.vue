@@ -63,8 +63,9 @@ export default {
             return str.substring(0, index) + replacement + str.substring(index + replacement.length);
         },
         focusInput(index) {
-            const input = this.$refs[`ww-input-verification-code-${index}`].componentRef;
+            let input = this.$refs[`ww-input-verification-code-${index}`]?.componentRef || this.$refs[`ww-input-verification-code-${index}`]?.[0]?.componentRef;
             try {
+                debugger;
                 input.focusInput();
             } catch {
                 wwLib.wwLog.warn('WARNING [INPUT-CODE], failed to focus input');
