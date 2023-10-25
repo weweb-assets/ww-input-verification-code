@@ -7,7 +7,7 @@
             :ref="`ww-input-verification-code-${index}`"
             v-bind="content.input"
             @keydown.backspace="backspace(index)"
-            :ww-props="{ value: localValue[index] }"
+            :ww-props="{ value: localValue[index] || ' '}"
             @element-event="onChange(index, $event)"
         />
     </div>
@@ -63,8 +63,9 @@ export default {
             return str.substring(0, index) + replacement + str.substring(index + replacement.length);
         },
         focusInput(index) {
-            const input = this.$refs[`ww-input-verification-code-${index}`].componentRef;
+            let input = this.$refs[`ww-input-verification-code-${index}`]?.componentRef || this.$refs[`ww-input-verification-code-${index}`]?.[0]?.componentRef;
             try {
+                debugger;
                 input.focusInput();
             } catch {
                 wwLib.wwLog.warn('WARNING [INPUT-CODE], failed to focus input');
@@ -82,10 +83,15 @@ export default {
                     this.focusInput(newFocusIndex);
                 }
             }
-            this.localValue = this.replaceAt(`${this.localValue}`, index, value).substring(0, this.content.nbrOfCode);
-            this.localValue = this.localValue.trim();
-            this.setValue(`${this.localValue}`);
-            this.$emit('trigger-event', { name: 'change', event: { value: `${this.localValue}` } });
+            let newValue = this.replaceAt(`${this.localValue}`, index, value).substring(0, this.content.nbrOfCode);
+            newValue = newValue.trim();
+            this.localValue = '';
+
+            this.$nextTick( () => {
+                this.localValue = newValue;
+                this.setValue(`${this.localValue}`);
+                this.$emit('trigger-event', { name: 'change', event: { value: `${this.localValue}` } });
+            })
         },
         backspace(index) {
             if (index && (this.localValue[index] === ' ' || this.localValue[index] === undefined))
