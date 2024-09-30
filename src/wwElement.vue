@@ -8,6 +8,7 @@
             v-bind="content.input"
             @keydown.backspace="backspace(index)"
             :ww-props="{ value: localValue[index] || ' '}"
+            @paste="onPaste(index, $event)"
             @element-event="onChange(index, $event)"
         />
     </div>
@@ -70,6 +71,10 @@ export default {
             } catch {
                 wwLib.wwLog.warn('WARNING [INPUT-CODE], failed to focus input');
             }
+        },
+        onPaste(index, pasteEvent) {
+            const pastedData = pasteEvent.clipboardData.getData('text');
+            this.onChange(index, { value: pastedData, type: 'update:value' });
         },
         onChange(index, { value, type }) {
             if (type !== 'update:value') return;
