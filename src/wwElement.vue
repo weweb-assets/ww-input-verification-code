@@ -10,6 +10,7 @@
             :ww-props="{ value: localValue[index] || ' '}"
             @paste="onPaste(index, $event)"
             @element-event="onChange(index, $event)"
+            @click="onFocused(index)"
         />
     </div>
 </template>
@@ -60,23 +61,34 @@ export default {
         },
     },
     methods: {
+        getInputComponentRef(index) {
+            return this.$refs[`ww-input-verification-code-${index}`]?.componentRef || this.$refs[`ww-input-verification-code-${index}`]?.[0]?.componentRef;
+        },
         replaceAt(str, index, replacement) {
             return str.substring(0, index) + replacement + str.substring(index + replacement.length);
         },
         focusInput(index) {
-            let input = this.$refs[`ww-input-verification-code-${index}`]?.componentRef || this.$refs[`ww-input-verification-code-${index}`]?.[0]?.componentRef;
+            let input = this.getInputComponentRef(index);
             try {
-                debugger;
                 input.focusInput();
             } catch {
                 wwLib.wwLog.warn('WARNING [INPUT-CODE], failed to focus input');
             }
         },
-        onPaste(index, pasteEvent) {
-            const pastedData = pasteEvent.clipboardData.getData('text');
-            this.onChange(index, { value: pastedData, type: 'update:value' });
+        onFocused(index) {
+            let input = this.getInputComponentRef(index);
+            try {
+                input.selectInput();
+            } catch {
+                wwLib.wwLog.warn('WARNING [INPUT-CODE], failed to select input');
+            }
         },
-        onChange(index, { value, type }) {
+        onPaste(index, pasteEvent) {
+            pasteEvent.preventDefault();
+            const pastedData = pasteEvent.clipboardData.getData('text');
+            this.onChange(index, { value: pastedData, type: 'update:value' }, true);
+        },
+        onChange(index, { value, type }, pastedData = false) {
             if (type !== 'update:value') return;
             value = value === null || value === undefined ? '' : `${value}`;
             value = value.trim();
