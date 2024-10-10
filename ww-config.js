@@ -14,7 +14,7 @@ export default {
     ],
     properties: {
         input: {
-            defaultValue: { isWwObject: true, type: 'aeb78b9a-6fb6-4c49-931d-faedcfad67ba' },
+            defaultValue: { isWwObject: true, type: 'deb10a01-5eef-4aa1-9017-1b51c2ad6fd0' },
             hidden: true,
         },
         nbrOfCode: {
