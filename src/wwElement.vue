@@ -116,6 +116,11 @@ export default {
             });
         },
         backspace(index) {
+            let newFocusIndex = index;
+            if (index > 0) {
+                newFocusIndex = index - 1;
+            }
+            
             if (index && (this.localValue[index] === ' ' || this.localValue[index] === undefined))
                 this.$nextTick(() => {
                     if (index !== newFocusIndex && index < this.content.nbrOfCode) {
