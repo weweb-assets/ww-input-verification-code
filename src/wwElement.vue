@@ -117,11 +117,7 @@ export default {
         },
         backspace(index) {
             if (index && (this.localValue[index] === ' ' || this.localValue[index] === undefined))
-                this.$nextTick(() => {
-                    if (index !== newFocusIndex && index < this.content.nbrOfCode) {
-                        this.focusInput(newFocusIndex);
-                    }
-                });
+                this.$nextTick(() => this.focusInput(index - 1));
         },
     },
 };
