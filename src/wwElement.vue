@@ -87,6 +87,9 @@ export default {
             }
         },
         onPaste(index, pasteEvent) {
+            let input = this.getInputComponentRef(index);
+            input?.inputRef?.blur(); // Unfocus to be sure the data is correctly pasted
+
             pasteEvent.preventDefault();
             const pastedData = pasteEvent.clipboardData.getData('text');
             this.onChange(index, { value: pastedData, type: 'update:value' }, true);
@@ -112,6 +115,16 @@ export default {
                 setTimeout(() => {
                     this.focusInput(newFocusIndex);
                     this.selectInput(newFocusIndex);
+
+                    // Unselect the text if the data is pasted
+                    if (pastedData) {
+                        const focusedInputComponent = this.getInputComponentRef(newFocusIndex);
+                        const input = focusedInputComponent?.inputRef;
+                        if (input && typeof input.setSelectionRange === 'function') {
+                            const textLength = input.value.length;
+                            input.setSelectionRange(textLength, textLength);
+                        }
+                    }
                 }, 0);
             });
         },
